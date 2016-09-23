@@ -24,7 +24,7 @@ exports = module.exports = function(req, res) {
             id: code._id.toString(),
             title: code.title,
             time: moment(code.createdAt).fromNow(),
-            expiresSoon: moment().add(1, 'd').isAfter(moment(code.expires))
+            expiresSoon: moment().add(locals.course.expireTime * 24 * 0.25, 'h').isAfter(moment(code.expires))
           });
         });
       }
