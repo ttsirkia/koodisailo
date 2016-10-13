@@ -109,6 +109,7 @@ exports = module.exports = function(req, res) {
       if (!err && user) {
         req.session.userId = user._id;
         req.user = user;
+        req.session.cookie.maxAge = 1000 * 3600 * 24 * 14;
 
         if (user.name.full !== name || user.email !== email) {
           user.name.full = name;
