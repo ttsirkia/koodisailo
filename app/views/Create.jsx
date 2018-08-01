@@ -18,6 +18,22 @@ const LimitWarning = function(props) {
   }
 };
 
+const PublicSnippet = function(props) {
+  if (props.show) {
+    return <div className="checkbox">
+      <label>
+        <input type="checkbox" name="public" id="public" value="public" defaultChecked={props.public}/>
+        <FormattedMessage id="public"/>
+      </label>
+      <p className="help-block small">
+        <FormattedMessage id="create-public-help"/>
+      </p>
+    </div>;
+  } else {
+    return null;
+  }
+};
+
 export class Create extends React.Component {
   constructor(props) {
     super(props);
@@ -68,15 +84,7 @@ export class Create extends React.Component {
           </div>
         </div>
 
-        <div className="checkbox">
-          <label>
-            <input type="checkbox" name="public" id="public" value="public" defaultChecked={this.props.view.public}/>
-            <FormattedMessage id="public"/>
-          </label>
-          <p className="help-block small">
-            <FormattedMessage id="create-public-help"/>
-          </p>
-        </div>
+        <PublicSnippet show={this.props.view.staff} public={this.props.view.public}/>
 
         <div className="form-group">
           <div className="col-sm-offset-2 col-sm-10">

@@ -18,6 +18,7 @@ exports = module.exports = function(req, res) {
 
     locals.reactData.view.expirationTime = locals.course.expireTime;
     locals.reactData.view.csrf = locals.csrf_token_value;
+    locals.reactData.view.staff = locals.staff === true;
 
     if (req.params.code) {
       const query = { _id: req.params.code, course: locals.course._id, user: locals.user._id };
@@ -70,6 +71,7 @@ exports = module.exports = function(req, res) {
     locals.reactData.view.content = req.body.content;
     locals.reactData.view.expirationTime = locals.course.expireTime;
     locals.reactData.view.csrf = locals.csrf_token_value;
+    locals.reactData.view.staff = locals.staff === true;
 
     if (!locals.staff) {
       req.body.public = false;
@@ -128,7 +130,7 @@ exports = module.exports = function(req, res) {
         course: locals.course._id,
         title: req.body.title || '?',
         content: req.body.content || '',
-        public: req.body.public === true,
+        public: req.body.public === 'public',
         expires: moment().add(locals.course.expireTime, 'd').toDate(),
       });
 
