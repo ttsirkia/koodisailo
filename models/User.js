@@ -1,8 +1,10 @@
-var keystone = require('keystone');
-var Types = keystone.Field.Types;
-var findOrCreate = require('mongoose-findorcreate');
+'use strict';
 
-var User = new keystone.List('User');
+const keystone = require('keystone');
+const Types = keystone.Field.Types;
+const findOrCreate = require('mongoose-findorcreate');
+
+const User = new keystone.List('User');
 
 //**********************************************************************************************
 

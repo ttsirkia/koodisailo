@@ -1,41 +1,52 @@
-var keystone = require('keystone');
-var moment = require('moment');
+'use strict';
+
+const keystone = require('keystone');
+const moment = require('moment');
 
 exports = module.exports = function(req, res) {
 
-  var Code = keystone.list('Code');
+  // The existence of locals.user or locals.course is not guaranteed here as
+  // anyone is allowed to see public code snippets!
 
-  var view = new keystone.View(req, res);
-  var locals = res.locals;
+  const Code = keystone.list('Code');
 
-  moment.locale('fi');
+  const view = new keystone.View(req, res);
+  const locals = res.locals;
 
+  locals.reactData.app.view = 'code';
+
+  locals.additionalResources = `<link rel="stylesheet" href="/koodisailo/scripts/highlight/styles/monokai-sublime.css">
+<script src="/koodisailo/scripts/jquery-3.3.1.min.js"></script>
+<script src="/koodisailo/scripts/highlight/highlight.pack.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>`;
 
   // **********************************************************************************************
 
   view.on('get', function(next) {
 
-    var query = { _id: req.params.code, course: locals.course._id };
-
-    if (!locals.staff) {
-      query.user = locals.user._id;
-    }
+    const query = { _id: req.params.code };
 
     Code.model.findOne(query).populate('user').lean().exec(function(err, code) {
 
-      if (err || !code) {
-        req.flash('error', 'Pyydettyä koodia ei löytynyt tai sinulla ei ole oikeutta katsoa sitä.');
-        res.redirect('/koodisailo/my');
+      const userOK = locals.user && code && code.user._id.toString() === locals.user._id.toString();
+      const staffOK = locals.course && locals.staff && code && code.course.toString() === locals.course._id.toString();
+      const publicOK = code && code.public === true;
+      const viewOK = userOK || staffOK || publicOK;
+
+      if (err || !code || !viewOK) {
+        req.flash('error', 'alert-code-not-found');
+        res.redirect('/koodisailo');
         return;
       }
 
-      locals.codeTitle = code.title;
-      locals.content = code.content;
-      locals.codeId = code._id.toString();
-      locals.created = moment(code.createdAt).fromNow();
-      locals.userId = code.user._id.toString();
-      locals.userName = code.user.name.first + ' ' + code.user.name.last;
-      locals.showRemove = code.user._id.toString() === locals.user._id.toString();
+      locals.reactData.view.csrf = locals.csrf_token_value;
+      locals.reactData.view.language = (locals.course || { language: '' }).language;
+      locals.reactData.view.codeTitle = code.title;
+      locals.reactData.view.content = code.content.replace(/\r/g, '');  // Highlight.js need this
+      locals.reactData.view.codeId = code._id.toString();
+      locals.reactData.view.created = moment(code.createdAt).valueOf();
+      locals.reactData.view.userName = code.user.name.first + ' ' + code.user.name.last;
+      locals.reactData.view.myCode = locals.user && code.user._id.toString() === locals.user._id.toString();
 
       next();
 
@@ -47,26 +58,32 @@ exports = module.exports = function(req, res) {
 
   view.on('post', { 'action': 'remove' }, function() {
 
-    var query = { _id: req.params.code, course: locals.course._id, user: locals.user._id };
+    if (!locals.course || !locals.user) {
+      req.flash('error', 'alert-code-not-found-delete');
+      res.redirect('/koodisailo');
+      return;
+    }
+
+    const query = { _id: req.params.code, course: locals.course._id, user: locals.user._id };
 
     Code.model.findOne(query).exec(function(err, code) {
 
       if (err || !code) {
-        req.flash('error', 'Pyydettyä koodia ei löytynyt tai sinulla ei ole oikeutta poistaa sitä.');
+        req.flash('error', 'alert-code-not-found-delete');
         res.redirect('/koodisailo/my');
         return;
       }
 
       code.remove(function(err) {
-          if (!err) {
-            req.flash('success', 'Koodi on poistettu.');
-            res.redirect('/koodisailo/my');
-            return;
-          } else {
-            req.flash('error', 'Koodin poistaminen epäonnistui.');
-            res.redirect('/koodisailo/my');
-            return;
-          }
+        if (!err) {
+          req.flash('success', 'alert-code-removed');
+          res.redirect('/koodisailo/my');
+          return;
+        } else {
+          req.flash('error', 'alert-remove-failed');
+          res.redirect('/koodisailo/my');
+          return;
+        }
       });
 
     });
@@ -75,6 +92,6 @@ exports = module.exports = function(req, res) {
 
   // **********************************************************************************************
 
-  view.render('code', locals);
+  view.render('reactView', locals);
 
 };

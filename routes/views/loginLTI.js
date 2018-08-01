@@ -1,31 +1,31 @@
-var keystone = require('keystone');
-var lti = require('ims-lti');
-var utils = keystone.utils;
+'use strict';
+
+const keystone = require('keystone');
+const lti = require('ims-lti');
+const utils = keystone.utils;
 
 exports = module.exports = function(req, res) {
 
-  var view = new keystone.View(req, res);
-  var locals = res.locals;
-  var User = keystone.list('User');
-  var Course = keystone.list('Course');
+  const User = keystone.list('User');
+  const Course = keystone.list('Course');
 
   // **********************************************************************************************
   // Helper functions
 
-  var loginOK = function() {
+  const loginOK = function() {
     res.redirect('/koodisailo/my');
   };
 
-  var loginFailed = function() {
-    req.flash('error', 'LTI-kirjautuminen epäonnistui.');
+  const loginFailed = function() {
+    req.flash('error', 'alert-lti-login-failed');
     res.redirect('/koodisailo');
   };
 
   // Check the course and if it doesn't exist, create a new course
-  var checkCourse = function(next) {
+  const checkCourse = function(next) {
 
-    var courseId = req.body.context_id;
-    var courseName = req.body.context_title;
+    const courseId = req.body.context_id;
+    const courseName = req.body.context_title;
 
     if (req.session.teacher) {
 
@@ -35,7 +35,7 @@ exports = module.exports = function(req, res) {
           if (!err && course) {
 
             if (created) {
-              req.flash('success', 'Luotiin uusi kurssi. Tarkista kurssin asetukset.');
+              req.flash('success', 'alert-new-course-created');
             }
 
             req.session.courseId = course._id;
@@ -67,7 +67,7 @@ exports = module.exports = function(req, res) {
 
             Course.model.findOne({ 'courseId': course.combined }, function(err, course) {
               if (err || !course) {
-                req.flash('error', 'Koodisäilö ei ole käytössä tällä kurssilla.');
+                req.flash('error', 'alert-vault-not-in-use');
                 res.redirect('/koodisailo');
               } else {
                 req.session.courseId = course._id;
@@ -80,7 +80,7 @@ exports = module.exports = function(req, res) {
 
         } else if (!err && !course) {
 
-          req.flash('error', 'Koodisäilö ei ole käytössä tällä kurssilla.');
+          req.flash('error', 'alert-vault-not-in-use');
           res.redirect('/koodisailo');
 
         } else {
@@ -95,14 +95,14 @@ exports = module.exports = function(req, res) {
   };
 
   // Checks the user and if it doesn't exist, create a new user
-  var checkUser = function(next) {
+  const checkUser = function(next) {
 
-    var email = req.body.lis_person_contact_email_primary;
-    var name = req.body.lis_person_name_full;
-    var userId = req.body.user_id;
-    var otherSystem = req.body.tool_consumer_instance_guid || '';
-    var combined = otherSystem + '|' + userId;
-    var newUser = { 'name.full': name, 'email': email, 'password': utils.randomString(10), 'ltiId': combined };
+    const email = req.body.lis_person_contact_email_primary;
+    const name = req.body.lis_person_name_full;
+    const userId = req.body.user_id;
+    const otherSystem = req.body.tool_consumer_instance_guid || '';
+    const combined = otherSystem + '|' + userId;
+    const newUser = { 'name.full': name, 'email': email, 'password': utils.randomString(10), 'ltiId': combined };
 
     User.model.findOrCreate({ 'ltiId': combined }, newUser, function(err, user) {
 
@@ -134,10 +134,22 @@ exports = module.exports = function(req, res) {
   // This is needed because of the URL rewrite in Nginx
   req.originalUrl = '/koodisailo/login/lti';
 
-  provider = new lti.Provider(keystone.get('lti key'), keystone.get('lti secret'));
+  const provider = new lti.Provider(keystone.get('lti key'), keystone.get('lti secret'));
   provider.valid_request(req, function(err, isValid) {
 
     if (isValid) {
+
+      // Take the UI language from the launch request if defined
+      // If it is form en-US, only the first part will be used
+
+      let language = null;
+      if (req.body.launch_presentation_locale) {
+        language = req.body.launch_presentation_locale.split('-')[0];
+      }
+      if (language && keystone.get('languages available').indexOf(language) < 0) {
+        language = keystone.get('default language');
+      }
+      req.session.uiLanguage = language || keystone.get('default language');
 
       checkUser(function() {
         req.session.teacher = /Instructor/.test(req.body.roles) || req.user.isAdmin;

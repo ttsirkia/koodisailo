@@ -81,3 +81,7 @@ p+table {
 .highlight-src {
 	padding-left: 5px;
 }
+
+.btn + .btn {
+	margin-left: 5px;
+}

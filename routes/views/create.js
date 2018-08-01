@@ -1,31 +1,40 @@
-var keystone = require('keystone');
-var moment = require('moment');
+'use strict';
+
+const keystone = require('keystone');
+const moment = require('moment');
 
 exports = module.exports = function(req, res) {
 
-  var Code = keystone.list('Code');
+  const Code = keystone.list('Code');
 
-  var view = new keystone.View(req, res);
-  var locals = res.locals;
+  const view = new keystone.View(req, res);
+  const locals = res.locals;
+
+  locals.reactData.app.view = 'create';
 
   // **********************************************************************************************
 
   view.on('get', function(next) {
 
+    locals.reactData.view.expirationTime = locals.course.expireTime;
+    locals.reactData.view.csrf = locals.csrf_token_value;
+
     if (req.params.code) {
-      var query = { _id: req.params.code, course: locals.course._id, user: locals.user._id };
+      const query = { _id: req.params.code, course: locals.course._id, user: locals.user._id };
 
       Code.model.findOne(query).lean().exec(function(err, code) {
 
         if (err || !code) {
-          req.flash('error', 'Pyydettyä koodia ei löytynyt tai sinulla ei ole oikeutta muokata sitä.');
+          req.flash('error', 'alert-code-not-found-edit');
           res.redirect('/koodisailo/my');
           return;
         }
 
-        locals.codeTitle = code.title;
-        locals.content = code.content;
-        locals.codeId = req.params.code;
+        locals.reactData.view.codeTitle = code.title;
+        locals.reactData.view.content = code.content;
+        locals.reactData.view.codeId = req.params.code;
+        locals.reactData.view.public = code.public === true;
+
         next();
 
       });
@@ -42,9 +51,9 @@ exports = module.exports = function(req, res) {
     Code.model.find({user: locals.user._id, course: locals.course._id}).count().exec(function(err, count) {
 
       if (!err) {
-        locals.codeCount = count;
+        locals.reactData.view.codeCount = count;
       } else {
-        locals.codeCount = 0;
+        locals.reactData.view.codeCount = 0;
       }
 
       next();
@@ -57,23 +66,24 @@ exports = module.exports = function(req, res) {
 
   view.on('post', { 'action': 'save' }, function(next) {
 
-    locals.codeTitle = req.body.title;
-    locals.content = req.body.content;
-    if ((req.body.content || '').length > 1024 * 20) {
-      req.flash('error', 'Lähettämäsi koodi on liian pitkä, tallennus epäonnistui.');
-      next();
-      return;
+    locals.reactData.view.codeTitle = req.body.title;
+    locals.reactData.view.content = req.body.content;
+    locals.reactData.view.expirationTime = locals.course.expireTime;
+    locals.reactData.view.csrf = locals.csrf_token_value;
+
+    if (!locals.staff) {
+      req.body.public = false;
     }
 
-    if (locals.codeCount >= 50) {
-      req.flash('error', 'Tallennettujen koodien enimmäismäärä on täynnä. Jotta voit tallentaa uusia koodeja, sinun täytyy poistaa nykyisiä koodeja palvelusta..');
+    if ((req.body.content || '').length > 1024 * 20) {
+      req.flash('error', 'alert-code-too-long');
       next();
       return;
     }
 
     // update or insert?
     if (req.params.code) {
-      var query = {
+      const query = {
         _id: req.params.code,
         user: locals.user._id,
         course: locals.course._id
@@ -82,44 +92,53 @@ exports = module.exports = function(req, res) {
       Code.model.findOne(query).exec(function(err, code) {
 
         if (code) {
-          code.title = req.body.title || '(nimetön)';
+          code.title = req.body.title || '?';
           code.content = req.body.content;
           code.expires = moment().add(locals.course.expireTime, 'd').toDate();
           code.createdAt = moment().toDate();
+          code.public = req.body.public === 'public';
           code.save(function(err) {
             if (!err) {
-              req.flash('success', 'Koodi on tallennettu.');
+              req.flash('success', 'alert-code-saved');
               res.redirect('/koodisailo/view/' + code._id.toString());
               return;
             } else {
-              req.flash('error', 'Tallentaminen epäonnistui.');
+              req.flash('error', 'alert-save-failed');
               next();
             }
           });
         } else {
-          req.flash('error', 'Tallentaminen epäonnistui.');
+          req.flash('error', 'alert-save-failed');
           next();
         }
 
       });
 
     } else {
-      var newCode = new Code.model();
+
+      if (locals.codeCount >= 50) {
+        req.flash('error', 'alert-too-many-codes');
+        next();
+        return;
+      }
+
+      const newCode = new Code.model();
       newCode.set({
         user: locals.user._id,
         course: locals.course._id,
-        title: req.body.title || '(nimetön)',
+        title: req.body.title || '?',
         content: req.body.content || '',
-        expires: moment().add(locals.course.expireTime, 'd').toDate()
+        public: req.body.public === true,
+        expires: moment().add(locals.course.expireTime, 'd').toDate(),
       });
 
       newCode.save(function(err) {
         if (!err) {
-          req.flash('success', 'Koodi on tallennettu. Mikäli haluat jakaa tämän koodin kurssihenkilökunnalle, voit antaa linkin tälle sivulle. Muut opiskelijat eivät voi nähdä koodia.');
+          req.flash('success', 'alert-new-code-saved');
           res.redirect('/koodisailo/view/' + newCode._id.toString());
           return;
         } else {
-          req.flash('error', 'Tallentaminen epäonnistui.');
+          req.flash('error', 'alert-save-failed');
           next();
         }
       });
@@ -130,6 +149,6 @@ exports = module.exports = function(req, res) {
 
   // **********************************************************************************************
 
-  view.render('create', locals);
+  view.render('reactView', locals);
 
 };

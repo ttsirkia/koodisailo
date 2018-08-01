@@ -1,35 +1,60 @@
-var keystone = require('keystone');
+'use strict';
+
+const keystone = require('keystone');
 
 exports = module.exports = function(req, res) {
 
-  var view = new keystone.View(req, res);
-  var locals = res.locals;
+  const view = new keystone.View(req, res);
+  const locals = res.locals;
+
+  // **********************************************************************************************
+
+  view.on('init', function(next) {
+    locals.reactData.app.view = 'settings';
+    locals.reactData.view = {
+        csrf: locals.csrf_token_value,
+        course: {
+          name: locals.course.name,
+          combined: locals.course.combined,
+          language: locals.course.language,
+          expireTime: locals.course.expireTime,
+          courseId: locals.course.courseId
+        }
+    };
+    next();
+  });
 
   // **********************************************************************************************
 
   view.on('post', { 'action': 'saveSettings' }, function(next) {
 
 
+    locals.reactData.view.course.name = req.body.name;
+    locals.reactData.view.course.combined = req.body.combined;
+    locals.reactData.view.course.language = req.body.language;
+
     locals.course.name = req.body.name;
     locals.course.combined = req.body.combined;
     locals.course.language = req.body.language;
     locals.course.expireTime = +req.body.expireTime;
 
-    if (isNaN(locals.course.expireTime) || locals.course.expireTime < 1) {
-      req.flash('warning', 'Säilymisaika ei ollut kelvollinen. Asetettiin koodien säilymisajaksi yksi päivä.');    
+    if (!/^\d+/.test(locals.reactData.view.course.expireTime) || locals.reactData.view.course.expireTime < 1) {
+      req.flash('warning', 'alert-too-short-expiration');
       locals.course.expireTime = 1;
     }
 
-    if (locals.course.expireTime > 365) {
-      req.flash('warning', 'Säilymisaika ei ollut kelvollinen. Asetettiin koodien säilymisajaksi yksi vuosi.');
+    if (locals.reactData.view.course.expireTime > 365) {
+      req.flash('warning', 'alert-too-long-expiration');
       locals.course.expireTime = 365;
     }
 
+    locals.reactData.view.course.expireTime = locals.course.expireTime;
+
     locals.course.save(function(err) {
       if (!err) {
-        req.flash('success', 'Kurssin asetukset on tallennettu.');
+        req.flash('success', 'alert-settings-saved');
       } else {
-        req.flash('error', 'Kurssin asetusten tallentaminen ei onnistunut.');
+        req.flash('error', 'alert-settings-save-failed');
       }
 
       next();
@@ -42,6 +67,6 @@ exports = module.exports = function(req, res) {
 
   // **********************************************************************************************
 
-  view.render('settings', locals);
+  view.render('reactView', locals);
 
 };
