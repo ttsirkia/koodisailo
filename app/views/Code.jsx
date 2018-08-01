@@ -11,7 +11,7 @@ import {injectIntl} from 'react-intl';
 // ***********************************
 
 const UserName = function(props) {
-  if (!props.myCode || true) {
+  if (!props.myCode) {
     return <h4>{props.userName}</h4>;
   } else {
     return null;
