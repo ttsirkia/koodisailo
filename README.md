@@ -58,5 +58,6 @@ Admin UI can be accessed in `http://localhost:3001/keystone`.
 Configure the LMS so that the LTI launch address will be `http://your.server.example/koodisailo/login/lti`.
 Check the keys once more in `server.js`.
 
-Use `upstart`, `systemd`, or such mechanism to launch the application (`node server.js`) when the operating
-system starts. Make sure that the environment variable `NODE_ENV` is set to `production`.
+Use `upstart`, `systemd`, or such mechanism to launch the application (`node server.js`) when the computer and
+operating system starts. Make sure that the environment variable `NODE_ENV` is set to `production`. The mechanism
+must also restart the application if it crashes for some reason.
