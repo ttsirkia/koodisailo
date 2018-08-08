@@ -21,17 +21,17 @@ keystone.init({
   'auth': true,
   'user model': 'User',
   'trust proxy': true,
-  'port': 3001,
+  'port': process.env.PORT || 3001,
   'session options': {
     'key': 'koodisailo.sid'
   },
   'languages available': ['fi', 'en'],
-  'default language': 'fi',
+  'default language': process.env.DEFAULT_LANGUAGE || 'fi',
 
-  // Change these!
-  'lti key': 'koodisailo',
-  'lti secret': 'koodisailo',
-  'cookie secret': 'secret',
+  // Define these environment variables or change default values!
+  'lti key': process.env.LTI_KEY || 'koodisailo',
+  'lti secret': process.env.LTI_SECRET || 'koodisailo',
+  'cookie secret': process.env.COOKIE_SECRET || 'secret',
 
   // Change also the default admin password in /updates/0.0.1-admins.js
 
