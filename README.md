@@ -51,8 +51,7 @@ location /koodisailo/ {
 }
 ```
 
-In order to use the Admin UI provided by KeystoneJS, configure the admin account information in `updates/0.0.1-admins.js`.
-Although the Admin UI is not normally needed, remember to change the credentials to prevent unpriviledged access.
+In order to use the Admin UI provided by KeystoneJS, configure the admin account information in `updates/0.0.1-admins.js.example` and remove the `.example` before starting the server. The Admin UI is not normally needed.
 Admin UI can be accessed in `http://localhost:3001/keystone`.
 
 Configure the LMS so that the LTI launch address will be `http://your.server.example/koodisailo/login/lti`.
