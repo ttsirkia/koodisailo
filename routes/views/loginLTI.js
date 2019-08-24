@@ -27,37 +27,18 @@ exports = module.exports = function(req, res) {
     const courseId = req.body.context_id;
     const courseName = req.body.context_title;
 
-    if (req.session.teacher) {
 
-      Course.model.findOrCreate({ 'courseId': courseId }, { 'name': courseName, 'createdBy': req.user._id, 'expireTime': 7 },
-        function(err, course, created) {
-
-          if (!err && course) {
-
-            if (created) {
-              req.flash('success', 'alert-new-course-created');
-            }
-
-            req.session.courseId = course._id;
-            req.course = course;
-            next();
-
-          } else {
-
-            loginFailed();
-
-          }
-
-        });
-
-    } else {
-
-      Course.model.findOne({ 'courseId': courseId }, function(err, course) {
+    Course.model.findOrCreate({ 'courseId': courseId }, { 'name': courseName, 'createdBy': req.user._id, 'expireTime': 7 },
+      function(err, course, created) {
 
         if (!err && course) {
 
+          if (created && req.session.teacher) {
+            req.flash('success', 'alert-new-course-created');
+          }
+
           // Is this a combined code vault and we should redirect user to another course?
-          if (!course.combined) {
+          if (!course.combined || req.session.teacher) {
 
             req.session.courseId = course._id;
             req.course = course;
@@ -68,7 +49,7 @@ exports = module.exports = function(req, res) {
             Course.model.findOne({ 'courseId': course.combined }, function(err, course) {
               if (err || !course) {
                 req.flash('error', 'alert-vault-not-in-use');
-                res.redirect('/koodisailo');
+                return res.redirect('/koodisailo');
               } else {
                 req.session.courseId = course._id;
                 req.course = course;
@@ -84,14 +65,11 @@ exports = module.exports = function(req, res) {
           res.redirect('/koodisailo');
 
         } else {
-
           loginFailed();
-
         }
 
       });
 
-    }
   };
 
   // Checks the user and if it doesn't exist, create a new user
