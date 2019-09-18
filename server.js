@@ -22,6 +22,7 @@ keystone.init({
   'user model': 'User',
   'trust proxy': true,
   'port': process.env.PORT || 3001,
+  'unix socket': process.env.UNIX_SOCKET || '',
   'session options': {
     'key': 'koodisailo.sid'
   },
