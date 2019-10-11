@@ -29,6 +29,9 @@ keystone.init({
   'languages available': ['fi', 'en'],
   'default language': process.env.DEFAULT_LANGUAGE || 'fi',
 
+  // Length of the session (hours)
+  'cookie expiration': (+process.env.COOKIE_EXPIRATION || (24 * 7 * 4)) * 1000 * 3600,
+
   // Define these environment variables or change default values!
   'lti key': process.env.LTI_KEY || 'koodisailo',
   'lti secret': process.env.LTI_SECRET || 'koodisailo',

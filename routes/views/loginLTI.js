@@ -87,7 +87,7 @@ exports = module.exports = function(req, res) {
       if (!err && user) {
         req.session.userId = user._id;
         req.user = user;
-        req.session.cookie.maxAge = 1000 * 3600 * 24 * 14;
+        req.session.cookie.maxAge = +keystone.get('cookie expiration');
 
         if (user.name.full !== name || user.email !== email) {
           user.name.full = name;
