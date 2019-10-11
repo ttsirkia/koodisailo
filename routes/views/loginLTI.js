@@ -13,6 +13,16 @@ exports = module.exports = function(req, res) {
   // Helper functions
 
   const loginOK = function() {
+
+    if (req.session.staff) {
+      if (!req.session.staffPermissions) {
+        req.session.staffPermissions = {};
+      }
+
+      req.session.staffPermissions[req.session.courseId] = true;
+
+    }
+
     res.redirect('/koodisailo/my');
   };
 

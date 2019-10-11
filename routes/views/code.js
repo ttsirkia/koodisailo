@@ -31,7 +31,8 @@ exports = module.exports = function(req, res) {
       const userOK = locals.user && code && code.user._id.toString() === locals.user._id.toString();
       const staffOK = locals.course && locals.staff && code && code.course.toString() === locals.course._id.toString();
       const publicOK = code && code.public === true;
-      const viewOK = userOK || staffOK || publicOK;
+      const staffPermissionsOK = code && req.session.staffPermissions && req.session.staffPermissions[code.course.toString()];
+      const viewOK = userOK || staffOK || publicOK || staffPermissionsOK;
 
       if (err || !code || !viewOK) {
         req.flash('error', 'alert-code-not-found');
@@ -47,6 +48,10 @@ exports = module.exports = function(req, res) {
       locals.reactData.view.created = moment(code.createdAt).valueOf();
       locals.reactData.view.userName = code.user.name.first + ' ' + code.user.name.last;
       locals.reactData.view.myCode = locals.user && code.user._id.toString() === locals.user._id.toString();
+
+      if (!locals.course || code.course.toString() !== locals.course._id.toString()) {
+        locals.reactData.course = {};
+      }
 
       next();
 

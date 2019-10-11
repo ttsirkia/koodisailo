@@ -1,6 +1,6 @@
 {
   "name": "koodisailo",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "dependencies": {
     "connect-mongo": "^3.0.0",
