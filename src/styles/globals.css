@@ -1,0 +1,76 @@
+html,
+body {
+  height: 100% !important;
+}
+
+#__next {
+  flex-direction: column !important;
+  height: 100% !important;
+  display: flex !important;
+}
+
+footer {
+  font-size: 85%;
+  color: #cccccc;
+}
+
+footer a {
+  color: #c0c0c0;
+}
+
+footer a:hover {
+  color: #999999;
+}
+
+.hljs td.hljs-ln-numbers {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  text-align: center;
+  color: #ccc;
+  border-right: 1px solid #555;
+  vertical-align: top;
+  padding-right: 5px;
+  min-width: 40px;
+}
+
+.hljs td.hljs-ln-code {
+  padding-left: 10px;
+}
+
+.alert-overlay {
+  background-color: #00000055;
+  position: fixed;
+  inset: 0;
+}
+
+.alert-dialog {
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 500px;
+  max-height: 85vh;
+  padding: 25px;
+  z-index: 10000;
+}
+
+.bi {
+  display: inline-block;
+  vertical-align: -0.125em;
+  fill: currentcolor;
+}
+
+h2,
+h3,
+h4 {
+  padding-bottom: 10px;
+}
