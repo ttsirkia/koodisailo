@@ -50,7 +50,7 @@ const ItemView: NextPage = (props) => {
 
     const clipboard = new ClipboardJS("#copy-button", {
       text: function (trigger) {
-        return itemQuery.data?.content || "";
+        return Base64.decode(itemQuery.data?.content || "");
       },
     });
 
