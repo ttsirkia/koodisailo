@@ -17,9 +17,12 @@ const LoginHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       const secret = JSON.parse(ltiConf.content)["secret"];
       const provider = new lti.Provider(ltiKey, secret);
 
-      // Add koodisailo manually because it is originally missing
-      // and validating the hash would fail
-      req.url = "/koodisailo/api/lti/v11/login";
+      // Add koodisailo manually to path because it is originally missing
+      // and validating the hash would fail. Also ims-lti library cannot
+      // find the information about the used protocol without setting it here.
+      const r: any = req;
+      r.protocol = req.headers["x-forwarded-proto"];
+      r.url = "/koodisailo/api/lti/v11/login";
 
       provider.valid_request(req, function (err: any, isValid: boolean) {
         if (!err && isValid) {
