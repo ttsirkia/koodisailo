@@ -1,6 +1,6 @@
 {
   "name": "koodisailo",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
@@ -49,4 +49,3 @@
     "typescript": "^4.7.4"
   }
 }
-

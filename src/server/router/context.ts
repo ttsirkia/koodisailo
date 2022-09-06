@@ -11,5 +11,24 @@ export const createContext = async (opts?: trpcNext.CreateNextContextOptions) =>
 
 type Context = trpc.inferAsyncReturnType<typeof createContext>;
 
-export const createRouter = () => trpc.router<Context>();
-
+export const createRouter = () =>
+  trpc.router<Context>().formatError(({ shape, error }) => {
+    console.log("***** ERROR *****");
+    console.log(new Date().toUTCString());
+    console.log(error);
+    console.log(shape);
+    console.log("***** END *****");
+    if (process.env.NODE_ENV === "production") {
+      return {
+        ...shape,
+        data: {
+          code: shape.data.code,
+          httpStatus: shape.data.httpStatus,
+        },
+        message: "",
+        code: -1,
+      };
+    } else {
+      return { ...shape };
+    }
+  });
