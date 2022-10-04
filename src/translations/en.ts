@@ -52,6 +52,8 @@ export const en: Translations = {
   "alert-loading-data-failed": "Loading data failed.",
   "alert-too-big-file": "The file exceeds the size limit.",
   "alert-quota-exceeded": "There is not enough space to store this item.",
+  "alert-copied": "Code is copied to clipboard.",
+  "alert-copy-failed": "Copying to clipboard failed.",
   "confirm-delete": "Do you really want to remove this code snippet?",
 
   "expires-soon": "Expires soon",

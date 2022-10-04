@@ -53,6 +53,8 @@ export const fi: Translations = {
   "alert-loading-data-failed": "Tietojen lataaminen epäonnistui.",
   "alert-too-big-file": "Tiedosto on liian suuri.",
   "alert-quota-exceeded": "Tallennustilaa ei ole jäljellä riittävästi.",
+  "alert-copied": "Koodi on kopioitu leikepöydälle.",
+  "alert-copy-failed": "Kopioiminen leikepöydälle epäonnistui.",
   "confirm-delete": "Haluatko varmasti poistaa tämän koodin?",
 
   "expires-soon": "Poistuu pian",

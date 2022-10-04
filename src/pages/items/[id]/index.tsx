@@ -54,6 +54,14 @@ const ItemView: NextPage = (props) => {
       },
     });
 
+    clipboard.on("success", () => {
+      toast.success(getTypedFormattedString(intl, "alert-copied"));
+    });
+
+    clipboard.on("error", () => {
+      toast.success(getTypedFormattedString(intl, "alert-copy-failed"));
+    });
+
     return () => {
       clipboard.destroy();
     };

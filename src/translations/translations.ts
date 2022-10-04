@@ -40,6 +40,8 @@ export type Translations = {
   "alert-loading-data-failed": string;
   "alert-too-big-file": string;
   "alert-quota-exceeded": string;
+  "alert-copied": string;
+  "alert-copy-failed": string;
   "confirm-delete": string;
 
   "expires-soon": string;
