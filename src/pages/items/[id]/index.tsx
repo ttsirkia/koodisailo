@@ -65,7 +65,7 @@ const ItemView: NextPage = (props) => {
     return () => {
       clipboard.destroy();
     };
-  }, [itemQuery.data?.content, itemQuery.data?.language]);
+  }, [intl, itemQuery.data?.content, itemQuery.data?.language]);
 
   // ************************************************************************************************
   if (itemQuery.isLoading) {
