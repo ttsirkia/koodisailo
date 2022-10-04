@@ -59,7 +59,7 @@ export namespace ItemService {
 
   // ************************************************************************************************
   export const hasPermission = (item: Item, richSessionData: RichSessionData, readOnly: boolean) => {
-    if (!isDocument(item.user)) {
+    if (!isDocument(item.user) || !isDocument(item.course)) {
       return false;
     }
 
@@ -73,7 +73,7 @@ export namespace ItemService {
       // User is staff member and has read access to this course (stored in session)
       item.course &&
       richSessionData.course &&
-      richSessionData.staffPermissionIn[richSessionData.course.id] === true &&
+      richSessionData.staffPermissionIn[item.course.id] === true &&
       readOnly
     ) {
       return true;
