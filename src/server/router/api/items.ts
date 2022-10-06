@@ -13,7 +13,7 @@ export const itemRouter = createRouter()
   // ************************************************************************************************
   .query("getItem", {
     // This is before the middleware to allow reading public pastes without a proper session
-    input: z.object({ id: z.string(), readOnly: z.boolean() }),
+    input: z.object({ id: z.string().regex(/^[a-fA-F0-9]{24}$/), readOnly: z.boolean() }),
     async resolve({ input, ctx }) {
       if (ctx.req && ctx.res) {
         const [session, richSession] = await getSession(ctx.req, ctx.res);
@@ -152,7 +152,7 @@ export const itemRouter = createRouter()
   })
   // ************************************************************************************************
   .mutation("delete", {
-    input: z.object({ id: z.string() }),
+    input: z.object({ id: z.string().regex(/^[a-fA-F0-9]{24}$/) }),
     async resolve({ input, ctx }) {
       const item = await ItemService.find(input.id);
       if (item && ItemService.hasPermission(item, ctx.richSession, false)) {
