@@ -18,6 +18,8 @@ export type SessionData = {
   language: string;
   role: Role;
   staffPermissionIn: Record<string, boolean>;
+  ltiKeyId?: string;
+  ltiNonce?: string;
 };
 
 export type RichSessionData = {

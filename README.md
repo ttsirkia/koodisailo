@@ -23,6 +23,7 @@ order):
 
 - [Bootstrap](https://getbootstrap.com/)
 - [Highlight.js](https://highlightjs.org/)
+- [JSON Web Almost Everything (jose)](https://github.com/panva/jose)
 - [Next.js](https://nextjs.org/)
 - [Node.js](https://nodejs.org/)
 - [MongoDB](https://www.mongodb.com/)
@@ -51,6 +52,17 @@ The previous version did not have any configurable storage quota. Now it can be
 defined how many kilobytes each user can use to store their code snippets. The
 upper limit is two megabytes as all data is stored in the database. Default
 quota is 500 kB.
+
+## Version 3.1
+
+What's new in this version?
+
+### LTI version 1.3
+
+LTI version 1.3 is now also supported. It can be configured manually or using
+LTI Open ID Connect Dynamic Registration Protocol which is supported, for
+example, by Moodle to automate the whole LTI registration process simply by
+generating a single URL which is entered to Moodle.
 
 ## Installation
 
@@ -88,20 +100,28 @@ Please notice that this configuration is not the same as in
 
 ## LTI Configuration
 
-LTI version 1.1 is currently supported.
+LTI versions 1.1 and 1.3 are supported.
 
-### Managing LTI keys
-
-There is a specific script `ltitool.ts` to configure the keys. In order to use
-it, you need to install `ts-node`:
+There is a specific tool `ltitool.ts` to configure the keys. In order to use it,
+you need to install `ts-node`:
 
 ```
 > sudo npm install -g typescript ts-node
 ```
 
+The tool will use values in `.env` and `.env.local` (if it exists) to configure
+the database connection, for example.
+
+Please notice that the keys are stored in the database without any encryption.
+
+If LTI version is changed, the users may get a new identity in Koodisäilö
+because of the different contents in the LTI launch request.
+
+### LTI version 1.1
+
 The tool provides four commands: `delete`, `list`, `set`, and `show`.
 
-#### Create a new key:
+##### Create a new key or update existing:
 
 ```
 > ts-node ltitool --ltiver=11 --key=test set
@@ -111,13 +131,17 @@ The tool will output a new random secret for the key `test`. If you run the same
 command again, a new secret will be assigned to the same key. You can also
 manually specify the secret by using the `--secret` parameter.
 
-#### Delete a key:
+To define more details about key usage, for example, it is possible to use
+`--desc` parameter and give a description. The description can be seen by using
+`list` or `show` commands.
+
+##### Delete a key:
 
 ```
 > ts-node ltitool --ltiver=11 --key=test delete
 ```
 
-#### List all keys:
+##### List all keys:
 
 ```
 > ts-node ltitool --ltiver=11 list
@@ -125,18 +149,152 @@ manually specify the secret by using the `--secret` parameter.
 
 This will show the names of the existing keys but not the secrets.
 
-#### Show the secret:
+##### Show the secret:
 
 ```
 > ts-node ltitool --ltiver=11 --key=test show
 ```
 
-Please notice that the keys are stored in the database without any encryption.
-
-### Launch URL
+#### Launch URL
 
 Configure your LMS so that the LTI launch address will be
 `http://your.server.example/koodisailo/api/lti/v11/login`.
+
+### LTI version 1.3
+
+Before LTI version 1.3 can be used, make sure that either `.env` or `.env.local`
+(suggested for production) defines the correct `HOSTNAME_URL` value. It must be
+in format `http://domain.example:3001` and start with `http` or `https` and
+contain the URL that will be used in browser to access the service. However, the
+remaining part `/koodisailo` must not be added and port is needed only if it is
+not 80 or 443 (this should never be the case in production).
+
+It is possible to manually define all the settings or use LTI Open ID Connect
+Dynamic Registration Protocol if LMS supports it (e.g. Moodle).
+
+The following claims are required in the LMS launch: `iss`, `sub`, `name`,
+`given_name`, `family_name`, and `email`.
+
+To define the correct role for the user, these LTI roles are recognized:
+
+- `http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant`
+  for assistants
+- `http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor` for teachers.
+
+All other roles are ignored and the user will get only student access if neither
+of the roles above are present.
+
+The following commands are available for managing the keys: `create`, `delete`,
+`export`, `import`, `initialize`, `list`, `set`, and `show`.
+
+##### Initialize a new key for dynamic registration:
+
+```
+> ts-node ltitool --ltiver=13 --name=test initialize
+```
+
+It will output a URL which is entered to LMS for automatic registration. Please
+notice that in Moodle you need to manully configure after the registration that
+the tool will open in a new window or otherwise the LTI launch does not work.
+
+The given name is only for internal use and is not shown in LTI requests in any
+way. To define more details about key usage, for example, it is possible to use
+`--desc` parameter and give a description. The description can be seen by using
+`list` or `show` commands.
+
+##### Initialize a new key manually:
+
+```
+> ts-node ltitool --ltiver=13 --name=test --iss=http://domain.example --login=http://domain.example/login create
+```
+
+You need to define the issuer (iss) as defined in the launch requests and the
+login URL which will be used to fetch the user information during the launch.
+
+The given name is only for internal use and is not shown in LTI requests in any
+way. To define more details about key usage, for example, it is possible to use
+`--desc` parameter and give a description. The description can be seen by using
+`list` or `show` commands.
+
+If the issuer uses a JWKS URL to provide its public key, use the `--jwks`
+parameter to define it. Otherwise you must use `import` command after the key is
+created to import the public key. The key cannot be used before either the JWKS
+URL or public key is defined.
+
+##### Import a public key for the issuer:
+
+```
+> ts-node ltitool --ltiver=13 --name=test --file=key.pem import
+```
+
+Imports a PEM-encoded SPKI string for the given key and uses it as its public
+key. It will override the possibly existing key or JWKS URL.
+
+##### Export the public key of Koodisäilö:
+
+```
+> ts-node ltitool --ltiver=13 --name=test --file=key.pem export
+```
+
+Exports a PEM-encoded SPKI string for the given key. The public key is not
+technically required because Koodisäilö does not send any data towards the LMS
+but it is typically needed when a tool is configured. Each key has its own
+public key.
+
+You can also use the JKWS URL if that is supported, the URL is shown by using
+the `show` command.
+
+##### Delete a key:
+
+```
+> ts-node ltitool --ltiver=13 --name=test delete
+```
+
+##### List all keys:
+
+```
+> ts-node ltitool --ltiver=13 list
+```
+
+##### Show details of a key:
+
+```
+> ts-node ltitool --ltiver=13 --name=test show
+```
+
+This will show all the details of an existing key such as the public keys, JWKS
+URLs and all other stored and configured details.
+
+##### Update configuration for a key:
+
+```
+> ts-node ltitool --ltiver=13 --name=test set
+```
+
+You can update any combination of the following settings by including them to
+the command:
+
+`--jwks` The URL for JKWS for fetching the public key of the issuer. Will
+replace the possibly existing manually defined public key.
+
+`--iss` The issuer defined in the LTI messages.
+
+`--login` The login URL.
+
+`--deploymentid` The deployment id for the LTI in the LMS. Typically not needed,
+but stored during the automated registration process if LMS provides the value.
+
+`--clientid` The client id for the LTI in the LMS. Typically not needed, but
+stored during the automated registration process if LMS provides the value.
+
+`--desc` The description of the key
+
+#### Launch URL
+
+If you need to configure the URLs manually, configure your LMS so that the LTI
+launch address will be `http://your.server.example/koodisailo/api/lti/v13/login`
+and callback URL will be
+`http://your.server.example/koodisailo/api/lti/v13/callback`.
 
 ## Running the service
 

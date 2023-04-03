@@ -23,6 +23,13 @@ export namespace CourseService {
   export const findOrCreate = async (name: string, courseId: string, user: User) => {
     await dbConnect();
     const result = await CourseModel.findOrCreate({ courseId }, { name, courseId, createdBy: user._id });
+
+    // Always update the name of the course
+    if (!result.created) {
+      result.doc.name = name;
+      await result.doc.save();
+    }
+
     return result;
   };
 

@@ -1,6 +1,6 @@
 {
   "name": "koodisailo",
-  "version": "3.0.5",
+  "version": "3.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
@@ -10,18 +10,20 @@
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.0.0",
-    "@typegoose/typegoose": "^9.11.0",
     "@trpc/client": "^9.26.0",
     "@trpc/next": "^9.26.0",
     "@trpc/react": "^9.26.0",
     "@trpc/server": "^9.26.0",
+    "@typegoose/typegoose": "^9.11.0",
     "bootstrap": "^5.1.3",
     "clipboard": "^2.0.11",
     "clsx": "^1.2.1",
     "connect-mongo": "^4.6.0",
+    "dotenv": "^16.0.3",
     "express-session": "^1.17.3",
     "highlightjs-line-numbers.js": "^2.8.0",
     "ims-lti": "^3.0.2",
+    "jose": "^4.13.1",
     "js-base64": "^3.7.2",
     "mongoose": "^6.5.0",
     "mongoose-findorcreate": "^3.0.0",
@@ -41,9 +43,9 @@
   "devDependencies": {
     "@next/bundle-analyzer": "^12.2.2",
     "@types/node": "^18.0.0",
+    "@types/randomstring": "^1.1.8",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
-    "@types/randomstring": "^1.1.8",
     "eslint": "^8.18.0",
     "eslint-config-next": "^12.2.2",
     "typescript": "^4.7.4"
