@@ -109,10 +109,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const roleURI = "https://purl.imsglobal.org/spec/lti/claim/roles";
   const taRole = "http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant";
   const teacherRole = "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor";
-  if ((LTIPayload[roleURI] as string[]).indexOf(taRole) >= 0) {
-    role = "staff";
-  } else if ((LTIPayload[roleURI] as string[]).indexOf(teacherRole) >= 0) {
+  if ((LTIPayload[roleURI] as string[]).indexOf(teacherRole) >= 0) {
     role = "teacher";
+  } else if ((LTIPayload[roleURI] as string[]).indexOf(taRole) >= 0) {
+    role = "staff";
   }
 
   // This will also commit changes to session

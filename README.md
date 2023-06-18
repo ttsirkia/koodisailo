@@ -241,7 +241,7 @@ technically required because Koodisäilö does not send any data towards the LMS
 but it is typically needed when a tool is configured. Each key has its own
 public key.
 
-You can also use the JKWS URL if that is supported, the URL is shown by using
+You can also use the JWKS URL if that is supported, the URL is shown by using
 the `show` command.
 
 ##### Delete a key:
@@ -274,7 +274,7 @@ URLs and all other stored and configured details.
 You can update any combination of the following settings by including them to
 the command:
 
-`--jwks` The URL for JKWS for fetching the public key of the issuer. Will
+`--jwks` The URL for JWKS for fetching the public key of the issuer. Will
 replace the possibly existing manually defined public key.
 
 `--iss` The issuer defined in the LTI messages.
@@ -315,7 +315,7 @@ In this mode, you can bypass the LTI login by launching the UI with an URL like
 this:
 `http://localhost:3001/koodisailo/api/login/testLogin?firstName=First&lastName=Last&course=Course+1&role=teacher&language=fi`
 
-This allow easily changing the user, course, roles (`student`, `staff` or
+This will allow easily changing the user, course, roles (`student`, `staff` or
 `teacher`) and languages (`en` and `fi`).
 
 The source code is formatted with [Prettier](https://prettier.io/) (used as a
