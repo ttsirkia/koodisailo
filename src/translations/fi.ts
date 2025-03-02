@@ -38,7 +38,7 @@ export const fi: Translations = {
     "Kurssin henkilökunta voi tehdä koodeista julkisia, jolloin kuka hyvänsä voi avata koodilinkin.",
 
   "view-lead":
-    "Mikäli haluat jakaa tämän koodin kurssihenkilökunnalle, voit antaa linkin tälle sivulle. Muut opiskelijat eivät voi nähdä koodia.",
+    "Mikäli haluat jakaa tämän koodin kurssihenkilökunnalle, voit antaa linkin tälle sivulle. Sivun osoitteen voit kopioida painamalla alla olevaa painiketta. Muut opiskelijat eivät voi nähdä koodia.",
 
   "alert-no-teacher": "Et ole opettaja.",
   "alert-code-not-found": "Pyydettyä koodia ei löytynyt tai sinulla ei ole oikeutta katsoa sitä.",
@@ -55,6 +55,7 @@ export const fi: Translations = {
   "alert-quota-exceeded": "Tallennustilaa ei ole jäljellä riittävästi.",
   "alert-copied": "Koodi on kopioitu leikepöydälle.",
   "alert-copy-failed": "Kopioiminen leikepöydälle epäonnistui.",
+  "alert-url-copied": "Osoite on kopioitu leikepöydälle.",
   "confirm-delete": "Haluatko varmasti poistaa tämän koodin?",
 
   "expires-soon": "Poistuu pian",
@@ -69,7 +70,8 @@ export const fi: Translations = {
   "expiration-time": "Säilymisaika",
   "programming-language": "Ohjelmointikieli",
   save: "Tallenna",
-  "copy-clipboard": "Kopioi leikepöydälle",
+  "copy-clipboard": "Kopioi koodi leikepöydälle",
+  "copy-url-clipboard": "Kopioi osoite",
   edit: "Muokkaa",
   remove: "Poista",
   content: "Sisältö",

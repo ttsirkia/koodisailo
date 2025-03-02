@@ -42,6 +42,7 @@ export type Translations = {
   "alert-quota-exceeded": string;
   "alert-copied": string;
   "alert-copy-failed": string;
+  "alert-url-copied": string;
   "confirm-delete": string;
 
   "expires-soon": string;
@@ -57,6 +58,7 @@ export type Translations = {
   "programming-language": string;
   save: string;
   "copy-clipboard": string;
+  "copy-url-clipboard": string;
   edit: string;
   remove: string;
   content: string;

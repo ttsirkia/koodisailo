@@ -37,7 +37,7 @@ export const en: Translations = {
     "As a course staff member you can make this snippet public. Anyone can open it by using a link.",
 
   "view-lead":
-    "If you want to share this snippet with the course staff, give a link to the current page. Other course participants cannot see your code.",
+    "If you want to share this snippet with the course staff, give a link to this page. You can copy the address by clicking the button below. Other course participants cannot see your code.",
 
   "alert-no-teacher": "You are not a teacher.",
   "alert-code-not-found": "The requested snippet could not be found or you are not allowed to view it.",
@@ -54,6 +54,7 @@ export const en: Translations = {
   "alert-quota-exceeded": "There is not enough space to store this item.",
   "alert-copied": "Code is copied to clipboard.",
   "alert-copy-failed": "Copying to clipboard failed.",
+  "alert-url-copied": "Address is copied to clipboard.",
   "confirm-delete": "Do you really want to remove this code snippet?",
 
   "expires-soon": "Expires soon",
@@ -68,7 +69,8 @@ export const en: Translations = {
   "expiration-time": "Expiration",
   "programming-language": "Programming language",
   save: "Save",
-  "copy-clipboard": "Copy to clipboard",
+  "copy-clipboard": "Copy code to clipboard",
+  "copy-url-clipboard": "Copy address",
   edit: "Edit",
   remove: "Remove",
   content: "Content",

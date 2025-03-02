@@ -1,6 +1,7 @@
+import ClipboardJS from "clipboard";
 import type { NextPage } from "next";
 import Link from "next/link";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FormattedRelativeTime, useIntl } from "react-intl";
 
@@ -18,6 +19,26 @@ import { trpc } from "../utils/trpc";
 const Home: NextPage = () => {
   const session = useContext(SessionContext);
   const intl = useIntl();
+
+  // ************************************************************************************************
+
+  useEffect(() => {
+    const clipboard = new ClipboardJS(".btn-url-copy");
+
+    clipboard.on("success", () => {
+      toast.success(getTypedFormattedString(intl, "alert-url-copied"));
+    });
+
+    clipboard.on("error", () => {
+      toast.success(getTypedFormattedString(intl, "alert-copy-failed"));
+    });
+
+    return () => {
+      clipboard.destroy();
+    };
+  }, [intl]);
+
+  // ************************************************************************************************
 
   if (session?.userName) {
     const itemsQuery = trpc.useQuery(["items.getAll"], { refetchInterval: 1000 * 60 * 5, refetchOnWindowFocus: true });
@@ -78,7 +99,12 @@ const Home: NextPage = () => {
                           <span>{(x.size / 1024).toFixed(1) + " " + getTypedFormattedString(intl, "kilobytes")}</span>
                         </td>
                         <td>
-                          {" "}
+                          <button
+                            className="btn btn-primary btn-sm btn-url-copy"
+                            data-clipboard-text={window.location.origin + "/koodisailo/items/" + x.id}
+                          >
+                            <TypedFormattedMessage id="copy-url-clipboard" />
+                          </button>{" "}
                           <AlertDialog
                             title={getTypedFormattedString(intl, "remove")}
                             text={getTypedFormattedString(intl, "confirm-delete")}
@@ -161,4 +187,3 @@ const Home: NextPage = () => {
 };
 
 export default Home;
-

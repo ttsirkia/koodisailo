@@ -48,22 +48,33 @@ const ItemView: NextPage = (props) => {
     hljs.highlightAll();
     hljs.initLineNumbersOnLoad();
 
-    const clipboard = new ClipboardJS("#copy-button", {
+    const clipboardCode = new ClipboardJS("#copy-button", {
       text: function (trigger) {
         return Base64.decode(itemQuery.data?.content || "");
       },
     });
 
-    clipboard.on("success", () => {
+    clipboardCode.on("success", () => {
       toast.success(getTypedFormattedString(intl, "alert-copied"));
     });
 
-    clipboard.on("error", () => {
+    clipboardCode.on("error", () => {
+      toast.success(getTypedFormattedString(intl, "alert-copy-failed"));
+    });
+
+    const clipboardURL = new ClipboardJS(".btn-url-copy");
+
+    clipboardURL.on("success", () => {
+      toast.success(getTypedFormattedString(intl, "alert-url-copied"));
+    });
+
+    clipboardURL.on("error", () => {
       toast.success(getTypedFormattedString(intl, "alert-copy-failed"));
     });
 
     return () => {
-      clipboard.destroy();
+      clipboardCode.destroy();
+      clipboardURL.destroy();
     };
   }, [intl, itemQuery.data?.content, itemQuery.data?.language]);
 
@@ -90,22 +101,32 @@ const ItemView: NextPage = (props) => {
 
           {!itemQuery.data.binary && (
             <>
-              <button id="copy-button" className="btn btn-primary btn-sm">
-                <TypedFormattedMessage id="copy-clipboard" />
-              </button>
-              {itemQuery.data.file && (
-                <a
-                  className="btn btn-primary btn-sm ms-2"
-                  download={itemQuery.data.title}
-                  href={window.URL.createObjectURL(
-                    new Blob([Base64.toUint8Array(itemQuery.data.content).buffer], {
-                      type: "application/octet-stream",
-                    })
-                  )}
+              <p>
+                <button
+                  className="btn btn-primary btn-sm btn-url-copy"
+                  data-clipboard-text={window.location.origin + "/koodisailo/items/" + itemQuery.data.id}
                 >
-                  <TypedFormattedMessage id="download" />
-                </a>
-              )}
+                  <TypedFormattedMessage id="copy-url-clipboard" />
+                </button>
+              </p>
+              <p>
+                <button id="copy-button" className="btn btn-primary btn-sm">
+                  <TypedFormattedMessage id="copy-clipboard" />
+                </button>
+                {itemQuery.data.file && (
+                  <a
+                    className="btn btn-primary btn-sm ms-2"
+                    download={itemQuery.data.title}
+                    href={window.URL.createObjectURL(
+                      new Blob([Base64.toUint8Array(itemQuery.data.content).buffer], {
+                        type: "application/octet-stream",
+                      })
+                    )}
+                  >
+                    <TypedFormattedMessage id="download" />
+                  </a>
+                )}
+              </p>
             </>
           )}
 
